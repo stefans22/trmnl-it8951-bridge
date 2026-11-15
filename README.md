@@ -73,8 +73,10 @@ Install Docker Engine with the compose plugin (for example `curl -fsSL https://g
 
 ### 4. TRMNL HA add-on
 
-- **Push:** in the add-on, create a schedule with webhook format *Raw Image*, webhook URL `http://<pi>:8080/api/image`, viewport `1200x825` (`825x1200` for portrait), palette `gray-16`, dithering on. If you set a token in the add-on, set the same one as `push.token` here.
+- **Push:** in the add-on, create a schedule with webhook format *Raw Image*, webhook URL `http://<pi>:8080/api/image`, viewport `1200x825` (`825x1200` for portrait), palette `gray-16`, dithering off (see below). If you set a token in the add-on, set the same one as `push.token` here.
 - **Pull:** use the add-on's Fetch URL with the same viewport and palette as `pull.url`.
+
+> **Leave the add-on's dithering off.** Its dither pattern changes on every render, so each light-gray area counts as changed and every update becomes a full refresh ("changed area 100%" in the log). If you want dithering, set `display.dither: true` in the bridge instead, which gives the same pattern for the same input. Even then, gray areas whose color falls between two of the 16 levels can show changes when nearby content changes. Theme colors that are exactly one gray level (e.g. `#eeeeee`) avoid this.
 
 ## Quick start
 

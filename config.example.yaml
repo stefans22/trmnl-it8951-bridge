@@ -17,7 +17,7 @@ push:
 
 pull:
   enabled: false
-  # url: http://homeassistant.local:10000/lovelace/0?viewport=1200x825&dithering&palette=gray-16
+  # url: http://homeassistant.local:10000/lovelace/0?viewport=1200x825&palette=gray-16  # no &dithering: it defeats partial refresh
   # interval_s: 600
 
 # storage:
