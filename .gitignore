@@ -29,3 +29,6 @@ build/
 docs/waveshare/IT8951-ePaper/STM32/
 docs/waveshare/IT8951-ePaper/Raspberry/pic/
 docs/waveshare/*.webarchive
+
+# Local development diary (not shared)
+docs/development-diary.md

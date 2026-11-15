@@ -29,7 +29,7 @@ push:
 
 pull:
   enabled: true
-  url: http://homeassistant.local:10000/lovelace/0?viewport=1200x825&dithering&palette=gray-16
+  url: http://homeassistant.local:10000/lovelace/0?viewport=1200x825&palette=gray-16
   interval_s: 600
 ```
 
@@ -60,7 +60,7 @@ pull:
 | `rotation_via_controller` | bool | `true` | Let the IT8951 rotate during upload. `false` rotates in software (fallback, see ADR 0008). |
 | `mirror_x` / `mirror_y` | bool | `false` | Mirror the image (always in software; the controller can't mirror). |
 | `size_mismatch` | `reject` \| `fit` \| `stretch` | `reject` | What to do with images that don't match the logical resolution. |
-| `dither` | bool | `false` | Floyd-Steinberg locally (normally the add-on dithers). |
+| `dither` | bool | `false` | Floyd-Steinberg locally. Use this instead of the add-on's dithering, whose pattern changes on every render and turns every update into a full refresh. |
 | `full_refresh_every` | int ≥ 0 | `10` | Full refresh after N partial updates; `0` = never. |
 | `full_refresh_area_ratio` | float 0–1 | `0.5` | Full refresh if the changed area exceeds this fraction. |
 | `full_refresh_waveform` | `gc16` \| `init_then_gc16` | `gc16` | `init_then_gc16` clears ghosting more thoroughly (extra flash). |

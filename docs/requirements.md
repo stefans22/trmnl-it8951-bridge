@@ -65,7 +65,7 @@ flowchart LR
 
 | ID | Requirement |
 |----|-------------|
-| FR-10 | Frames are converted to 16 gray levels (4 bpp). Dithering is expected to be done by the add-on (`palette=gray-16`). Optional local dithering can be configured. |
+| FR-10 | Frames are converted to 16 gray levels (4 bpp). The add-on delivers `palette=gray-16` without dithering (its dither pattern changes on every render and would defeat partial updates). Optional local dithering, deterministic for the same input, can be configured. |
 | FR-11 | **Partial updates:** each new frame is compared with the frame currently on the panel. Only the changed rectangle(s) are uploaded and refreshed. |
 | FR-12 | A frame identical to the current one causes **no panel activity**. |
 | FR-13 | A **full refresh** runs every *N* partial updates (configurable, `0` = never), and when the changed area exceeds a configurable fraction of the panel. |
