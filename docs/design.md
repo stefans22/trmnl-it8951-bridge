@@ -365,7 +365,7 @@ flowchart LR
     T --> U["test<br/>pytest + coverage"]
     L --> B["build linux/arm64<br/>buildx (native arm64 runner,<br/>QEMU fallback)"]
     U --> B
-    B -->|"master: edge, sha-xxxx<br/>tag vX.Y.Z: X.Y.Z, X.Y, latest"| R[(ghcr.io/owner/repo)]
+    B -->|"main: edge, sha-xxxx<br/>tag vX.Y.Z: X.Y.Z, X.Y, latest"| R[(ghcr.io/owner/repo)]
     B -.->|PR: build only| X[no push]
 ```
 
