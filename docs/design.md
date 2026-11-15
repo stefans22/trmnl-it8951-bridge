@@ -361,11 +361,11 @@ Coverage target: ≥ 90 % excluding `driver/transport.py`.
 
 ```mermaid
 flowchart LR
-    T[push / PR / tag] --> L["lint<br/>ruff check, ruff format --check,<br/>mypy, hadolint"]
+    T[push to main / PR] --> L["lint<br/>ruff check, ruff format --check,<br/>mypy, hadolint"]
     T --> U["test<br/>pytest + coverage"]
     L --> B["build linux/arm64<br/>buildx (native arm64 runner,<br/>QEMU fallback)"]
     U --> B
-    B -->|"main: edge, sha-xxxx<br/>tag vX.Y.Z: X.Y.Z, X.Y, latest"| R[(ghcr.io/owner/repo)]
+    B -->|"main: latest"| R[(ghcr.io/stefans22/trmnl-it8951-bridge)]
     B -.->|PR: build only| X[no push]
 ```
 

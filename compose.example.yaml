@@ -1,7 +1,7 @@
 # Example for the Raspberry Pi. Host prerequisites: see README.md ("Host requirements").
 services:
   display:
-    image: ghcr.io/OWNER/trmnl-it8951-bridge:latest   # replace OWNER with the GitHub owner
+    image: ghcr.io/stefans22/trmnl-it8951-bridge:latest   # latest = current main
     restart: unless-stopped
     stop_grace_period: 30s          # time for the clear-to-white on shutdown
     ports:
@@ -12,6 +12,9 @@ services:
     group_add:                      # GIDs of the host's spi and gpio groups: `getent group spi gpio`
       - "999"
       - "997"
+    # Rootless Podman remaps group IDs, so the GIDs above don't work there. Use instead:
+    # group_add:
+    #   - keep-groups               # passes your user's groups (must include spi and gpio)
     volumes:
       - ./config:/config:ro         # config.yaml (optional if everything is set via environment)
       - display-data:/data          # last image + refresh counters

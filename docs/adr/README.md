@@ -21,3 +21,4 @@ New ADR: copy [template.md](template.md) to the next number.
 | [0011](0011-reject-size-mismatch.md) | Reject images of the wrong size by default | Accepted |
 | [0012](0012-arm64-ghcr.md) | arm64-only image built in GitHub Actions, published to GHCR | Accepted |
 | [0013](0013-mit-license.md) | MIT license | Accepted |
+| [0014](0014-image-tags.md) | CI triggers and image tags: `latest` from main, PRs build only | Accepted |

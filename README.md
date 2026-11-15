@@ -65,6 +65,8 @@ getent group spi gpio
 # spi:x:999:...   gpio:x:997:...   (values vary)
 ```
 
+**Rootless Podman** remaps group IDs inside the container, so numeric GIDs in `group_add` don't grant access there. Instead, add the user that runs Podman to both groups (`sudo usermod -aG spi,gpio $USER`, then log in again) and use `group_add: [keep-groups]` (see `compose.example.yaml`). `keep-groups` can't be combined with other `group_add` entries.
+
 ### 3. Docker
 
 Install Docker Engine with the compose plugin (for example `curl -fsSL https://get.docker.com | sh`), and add your user to the `docker` group.
@@ -78,7 +80,7 @@ Install Docker Engine with the compose plugin (for example `curl -fsSL https://g
 
 On the Pi, in an empty directory:
 
-1. Copy [`compose.example.yaml`](compose.example.yaml) to `compose.yaml`. Set the image owner, the `group_add` GIDs from step 2 and your VCOM.
+1. Copy [`compose.example.yaml`](compose.example.yaml) to `compose.yaml`. Set the `group_add` GIDs from step 2 and your VCOM.
 2. Optionally copy [`config.example.yaml`](config.example.yaml) to `config/config.yaml` for further settings. All settings are listed in [docs/configuration.md](docs/configuration.md).
 3. `docker compose up -d`, then open `http://<pi>:8080/` for the status page.
 
@@ -115,4 +117,4 @@ EPD_PANEL__VCOM=-1.5 EPD_PANEL__DRIVER=fake EPD_STORAGE__DATA_DIR=.data \
 curl -X POST --data-binary @dashboard.png http://localhost:8080/api/image
 ```
 
-The image is built in GitHub Actions for `linux/arm64` and published to `ghcr.io/<owner>/<repo>` ([workflow](.github/workflows/ci.yml)). To build it locally, use `docker buildx build --platform linux/arm64 .` (needs QEMU/binfmt on non-ARM hosts).
+The image is built in GitHub Actions for `linux/arm64` and published to `ghcr.io/stefans22/trmnl-it8951-bridge` ([workflow](.github/workflows/ci.yml)). Every push to `main` publishes `latest`; pull requests build the image without publishing it. Other branches only run CI through a pull request. To build it locally, use `docker buildx build --platform linux/arm64 .` (needs QEMU/binfmt on non-ARM hosts).

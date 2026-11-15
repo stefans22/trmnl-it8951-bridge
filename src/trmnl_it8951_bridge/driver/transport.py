@@ -83,11 +83,17 @@ class SpiGpioTransport:
 
         self._rst, self._hrdy, self._cs = pin_rst, pin_hrdy, pin_cs
         self._timeout = ready_timeout_s
-        self._gpio = _Gpio(gpio_chip, outputs=[pin_rst, pin_cs], inputs=[pin_hrdy])
+        try:
+            self._gpio = _Gpio(gpio_chip, outputs=[pin_rst, pin_cs], inputs=[pin_hrdy])
+        except OSError as e:
+            raise PanelError(f"cannot open {gpio_chip} (pins {pin_rst}/{pin_hrdy}/{pin_cs}): {e}") from e
         try:
             bus, dev = (int(p) for p in spi_device.name.removeprefix("spidev").split("."))
             self._spi = spidev.SpiDev()
-            self._spi.open(bus, dev)
+            try:
+                self._spi.open(bus, dev)
+            except OSError as e:
+                raise PanelError(f"cannot open {spi_device}: {e}") from e
             self._spi.mode = 0
             self._spi.max_speed_hz = speed_hz
             with contextlib.suppress(OSError, AttributeError):

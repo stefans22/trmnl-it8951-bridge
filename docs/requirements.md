@@ -44,7 +44,7 @@ flowchart LR
 | C-3 | The reference hardware is the **9.7" e-Paper HAT, 1200×825, 16 gray levels, IT8951 firmware/LUT `M841`**. Other IT8951 panels should work through configuration but are not tested. |
 | C-4 | Runs in a **trusted network**. No TLS, no user management. |
 | C-5 | Host prerequisites (SPI enabled, device permissions, Docker) are documented in the project README and can be assumed to be in place. |
-| C-6 | The container is built by a GitHub Actions workflow and pushed to the GitHub Container Registry of the repository (`ghcr.io/<owner>/<repo>`). |
+| C-6 | The container is built by a GitHub Actions workflow and pushed to the GitHub Container Registry of the repository (`ghcr.io/stefans22/trmnl-it8951-bridge`). |
 | C-7 | Documentation is Markdown in `docs/`, and diagrams are Mermaid. |
 
 ## 4. Functional requirements
@@ -104,7 +104,7 @@ flowchart LR
 | NFR-4 | **Panel care:** the VCOM is always applied. A full refresh cadence prevents ghosting buildup. The panel is cleared on shutdown. |
 | NFR-5 | **Security:** runs as a non-root user with only the SPI and GPIO devices mapped (no `--privileged`). Push bodies are limited in size (default 10 MB). |
 | NFR-6 | **Quality gates:** linting, type checking and unit tests run in CI on every push and PR. Everything except the low-level SPI/GPIO access is testable without hardware. |
-| NFR-7 | **Build:** CI builds the `linux/arm64` image, pushes it to GHCR on the default branch (`edge`/`sha` tags) and on version tags (`vX.Y.Z`, `latest`). PRs build but don't push. |
+| NFR-7 | **Build:** CI builds the `linux/arm64` image, pushes it to GHCR as `latest` on every push to `main` ([ADR 0014](adr/0014-image-tags.md)). PRs build but don't push; other branches run CI only through PRs. |
 | NFR-8 | **Documentation:** README (overview, host setup, quick start), `docs/requirements.md`, `docs/design.md`, `docs/configuration.md` (generated or kept in sync with the config model), and an API reference. |
 
 ## 6. Out of scope
