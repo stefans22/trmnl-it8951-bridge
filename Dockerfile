@@ -7,6 +7,8 @@ FROM python:3.12-slim-bookworm AS build
 COPY --from=ghcr.io/astral-sh/uv:0.13.8 /uv /usr/local/bin/uv
 
 # spidev and gpiod are source-only packages (gpiod bundles libgpiod's C sources).
+# Not pinned: Debian drops old versions on security updates, and gcc stays in this build stage.
+# hadolint ignore=DL3008
 RUN apt-get update \
     && apt-get install -y --no-install-recommends gcc libc6-dev \
     && rm -rf /var/lib/apt/lists/*
