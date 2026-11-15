@@ -65,7 +65,7 @@ getent group spi gpio
 # spi:x:999:...   gpio:x:997:...   (values vary)
 ```
 
-**Rootless Podman** remaps group IDs inside the container, so numeric GIDs in `group_add` don't grant access there. Instead, add the user that runs Podman to both groups (`sudo usermod -aG spi,gpio $USER`, then log in again) and use `group_add: [keep-groups]` (see `compose.example.yaml`). `keep-groups` can't be combined with other `group_add` entries.
+**Rootless Podman** remaps group IDs inside the container, so numeric GIDs in `group_add` don't grant access there. Instead, add the user that runs Podman to both groups (`sudo usermod -aG spi,gpio $USER`, then log in again) and use `group_add: [keep-groups]` (see `compose.example.yaml`). `keep-groups` can't be combined with other `group_add` entries. podman-compose before 1.0.6 silently ignores `group_add`; there, use `annotations: [run.oci.keep_original_groups=1]` instead, which is what `keep-groups` sets (requires the `crun` runtime). After adding yourself to the groups, run `podman system migrate` so rootless Podman picks up the new groups.
 
 ### 3. Docker
 

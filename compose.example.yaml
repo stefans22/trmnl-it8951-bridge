@@ -15,6 +15,9 @@ services:
     # Rootless Podman remaps group IDs, so the GIDs above don't work there. Use instead:
     # group_add:
     #   - keep-groups               # passes your user's groups (must include spi and gpio)
+    # podman-compose < 1.0.6 silently ignores group_add; set what keep-groups does (needs crun):
+    # annotations:
+    #   - run.oci.keep_original_groups=1
     volumes:
       - ./config:/config:ro         # config.yaml (optional if everything is set via environment)
       - display-data:/data          # last image + refresh counters
