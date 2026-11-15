@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>e-paper display</title>
+<style>
+  :root { --bg: #f6f6f4; --fg: #1b1b1b; --muted: #6b6b6b; --card: #fff; --line: #ddd; --ok: #2e7d32; --bad: #c62828; --warn: #b26a00; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #161616; --fg: #ececec; --muted: #9a9a9a; --card: #222; --line: #333; --ok: #66bb6a; --bad: #ef5350; --warn: #ffb74d; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.45 system-ui, sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
+  @media (max-width: 800px) { main { grid-template-columns: 1fr; } }
+  h1 { font-size: 18px; margin: 0 0 8px; display: flex; gap: 8px; align-items: center; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
+  .badge { font-size: 12px; padding: 2px 8px; border-radius: 99px; border: 1px solid currentColor; }
+  .ok { color: var(--ok); } .bad { color: var(--bad); } .warn { color: var(--warn); }
+  #img { width: 100%; height: auto; background: #fff; border: 1px solid var(--line); image-rendering: pixelated; }
+  #empty { color: var(--muted); padding: 40px 0; text-align: center; }
+  dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 0; }
+  dt { color: var(--muted); } dd { margin: 0; overflow-wrap: anywhere; }
+  h2 { font-size: 14px; margin: 14px 0 6px; color: var(--muted); font-weight: 600; }
+  h2:first-child { margin-top: 0; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; align-items: center; }
+  button { font: inherit; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); cursor: pointer; }
+  input { font: inherit; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); min-width: 0; flex: 1; }
+  #msg { color: var(--muted); font-size: 13px; }
+  details pre { font-size: 12px; overflow: auto; max-height: 320px; }
+</style>
+</head>
+<body>
+<main>
+  <section>
+    <h1>e-paper display <span id="state" class="badge">…</span></h1>
+    <img id="img" alt="image currently on the panel" hidden>
+    <div id="empty">Nothing is shown on the panel.</div>
+    <div class="actions">
+      <button id="refresh" type="button">Full refresh</button>
+      <button id="clear" type="button">Clear panel</button>
+      <input id="token" type="password" placeholder="Bearer token (if configured)" autocomplete="off">
+      <span id="msg"></span>
+    </div>
+  </section>
+  <section>
+    <h2>Current image</h2>
+    <dl id="current"></dl>
+    <h2>Last update</h2>
+    <dl id="update"></dl>
+    <h2>Panel</h2>
+    <dl id="panel"></dl>
+    <h2>Pull</h2>
+    <dl id="pull"></dl>
+    <h2>Counters</h2>
+    <dl id="counters"></dl>
+    <details><summary>Raw status</summary><pre id="raw"></pre></details>
+  </section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+let lastHash = null;
+try { $("token").value = localStorage.getItem("token") || ""; } catch (e) {}
+$("token").addEventListener("change", () => { try { localStorage.setItem("token", $("token").value); } catch (e) {} });
+
+function fill(id, entries) {
+  const dl = $(id);
+  dl.replaceChildren();
+  if (!entries) { const dd = document.createElement("dd"); dd.textContent = "–"; dl.append(dd); return; }
+  for (const [k, v] of entries) {
+    const dt = document.createElement("dt"); dt.textContent = k;
+    const dd = document.createElement("dd"); dd.textContent = v ?? "–";
+    dl.append(dt, dd);
+  }
+}
+
+async function load() {
+  let s;
+  try { s = await (await fetch("api/status")).json(); } catch (e) { $("state").textContent = "unreachable"; $("state").className = "badge bad"; return; }
+  const cls = { idle: "ok", updating: "warn", starting: "warn", recovering: "warn" }[s.state] || "bad";
+  $("state").textContent = s.state; $("state").className = "badge " + cls;
+  const c = s.current;
+  if (c) {
+    if (c.hash !== lastHash) { $("img").src = "api/image/current.png?" + c.hash; lastHash = c.hash; }
+    $("img").hidden = false; $("empty").hidden = true;
+  } else { $("img").hidden = true; $("empty").hidden = false; lastHash = null; }
+  fill("current", c && [["source", c.source], ["received", c.received_at], ["displayed", c.displayed_at], ["frame", c.frame_id], ["pending", s.pending_frame]]);
+  const u = s.last_update;
+  fill("update", u && [["kind", u.kind], ["reason", u.reason], ["rectangles", u.rects], ["duration", u.duration_s + " s"], ["at", u.at], ["since full", s.since_full], ["last error", s.last_error ? s.last_error.at + " " + s.last_error.message : null]]);
+  const p = s.panel;
+  fill("panel", p && [["size", p.width + "×" + p.height], ["image size", p.logical_width + "×" + p.logical_height], ["rotation", s.display.rotation + "°"], ["LUT / FW", p.lut_version + " / " + p.fw_version], ["VCOM", p.vcom + " V"]]);
+  const pl = s.pull;
+  fill("pull", pl ? [["url", pl.url], ["interval", pl.interval_s + " s"], ["last success", pl.last_success], ["last error", pl.last_error], ["next run", pl.next_run]] : [["pull", "disabled"]]);
+  fill("counters", Object.entries(s.counters));
+  $("raw").textContent = JSON.stringify(s, null, 2);
+}
+
+async function post(path) {
+  const headers = {};
+  if ($("token").value) headers["Authorization"] = "Bearer " + $("token").value;
+  const r = await fetch(path, { method: "POST", headers });
+  $("msg").textContent = r.ok ? "queued" : r.status + " " + ((await r.json()).detail || r.statusText);
+  setTimeout(load, 500);
+}
+$("refresh").onclick = () => post("api/refresh");
+$("clear").onclick = () => post("api/clear");
+load();
+setInterval(load, 5000);
+</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+# Copy to ./config/config.yaml (mounted at /config in the container).
+# Every key can also be set as an environment variable: EPD_<SECTION>__<KEY>,
+# e.g. EPD_PANEL__VCOM=-1.87. Environment variables win over this file.
+# Reference: docs/configuration.md
+
+panel:
+  vcom: -1.87            # REQUIRED - printed on the panel's FPC cable
+
+display:
+  rotation: 0            # 0/180 = landscape 1200x825, 90/270 = portrait 825x1200 (clockwise)
+  full_refresh_every: 10 # full refresh after this many partial updates (0 = never)
+  # size_mismatch: reject  # or fit / stretch
+
+push:
+  enabled: true
+  # token: change-me     # same token as configured in the add-on's webhook
+
+pull:
+  enabled: false
+  # url: http://homeassistant.local:10000/lovelace/0?viewport=1200x825&dithering&palette=gray-16
+  # interval_s: 600
+
+log:
+  level: INFO

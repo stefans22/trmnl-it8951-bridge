@@ -95,9 +95,7 @@ class Gpio:
 
             self._val = Value
             config: dict[Any, Any] = {
-                tuple(outputs): gpiod.LineSettings(
-                    direction=Direction.OUTPUT, output_value=Value.ACTIVE
-                ),
+                tuple(outputs): gpiod.LineSettings(direction=Direction.OUTPUT, output_value=Value.ACTIVE),
                 tuple(inputs): gpiod.LineSettings(direction=Direction.INPUT),
             }
             self._req = gpiod.request_lines(chip, consumer=consumer, config=config)
@@ -160,9 +158,7 @@ class Spi:
 class Transport:
     """IT8951 host interface over SPI: preamble + HRDY handshake + manual CS."""
 
-    def __init__(
-        self, spi: Spi, gpio: Gpio, rst: int, hrdy: int, cs: int, timeout_s: float
-    ) -> None:
+    def __init__(self, spi: Spi, gpio: Gpio, rst: int, hrdy: int, cs: int, timeout_s: float) -> None:
         self.spi, self.gpio = spi, gpio
         self.rst, self.hrdy, self.cs = rst, hrdy, cs
         self.timeout_s = timeout_s
@@ -432,7 +428,9 @@ def controller_code(rotation: int) -> int:
     return ((360 - rotation) % 360) // 90
 
 
-def to_physical(rect: tuple[int, int, int, int], rotation: int, pw: int, ph: int) -> tuple[int, int, int, int]:
+def to_physical(
+    rect: tuple[int, int, int, int], rotation: int, pw: int, ph: int
+) -> tuple[int, int, int, int]:
     """Map a rect in logical (image) coordinates to physical panel coordinates.
 
     `rotation` is the clockwise rotation of the image onto the panel (config
@@ -602,12 +600,21 @@ def step_env(ctx: Ctx) -> bool:
             lines = [ln.strip() for ln in cfg.read_text().splitlines() if not ln.strip().startswith("#")]
             has_0cs = any(ln.startswith("dtoverlay=spi0-0cs") for ln in lines)
             spi_on = any(ln.startswith("dtparam=spi=on") for ln in lines)
-            ctx.add("env", f"{cfg}: dtoverlay=spi0-0cs active", "pass" if has_0cs else "fail",
-                    "" if has_0cs else "add it, comment out dtparam=spi=on, reboot (see README)")
+            ctx.add(
+                "env",
+                f"{cfg}: dtoverlay=spi0-0cs active",
+                "pass" if has_0cs else "fail",
+                "" if has_0cs else "add it, comment out dtparam=spi=on, reboot (see README)",
+            )
             if spi_on:
-                ctx.add("env", "dtparam=spi=on is active", "fail" if not has_0cs else "info",
-                        "claims GPIO 8 as hardware CS, so the script cannot drive it" if not has_0cs
-                        else "Waveshare recommends commenting it out")
+                ctx.add(
+                    "env",
+                    "dtparam=spi=on is active",
+                    "fail" if not has_0cs else "info",
+                    "claims GPIO 8 as hardware CS, so the script cannot drive it"
+                    if not has_0cs
+                    else "Waveshare recommends commenting it out",
+                )
             config_ok = has_0cs
             break
     else:
@@ -616,8 +623,12 @@ def step_env(ctx: Ctx) -> bool:
     for dev in (a.spi, a.gpiochip):
         exists = Path(dev).exists()
         rw = exists and os.access(dev, os.R_OK | os.W_OK)
-        ctx.add("env", f"{dev} exists and is read/writable", "pass" if rw else "fail",
-                "" if rw else ("missing" if not exists else "no permission (group spi/gpio?)"))
+        ctx.add(
+            "env",
+            f"{dev} exists and is read/writable",
+            "pass" if rw else "fail",
+            "" if rw else ("missing" if not exists else "no permission (group spi/gpio?)"),
+        )
         ok &= rw
     for mod in ("spidev", "gpiod"):
         try:
@@ -642,16 +653,29 @@ def step_info(ctx: Ctx) -> bool:
         return False
     ctx.info = info
     plausible = 0 < info.width <= 4096 and 0 < info.height <= 4096 and info.lut.isprintable() and info.lut
-    ctx.add("info", "device info plausible", "pass" if plausible else "fail",
-            f"{info.width}x{info.height}, image buffer 0x{info.img_addr:08X}, FW '{info.fw}', LUT '{info.lut}'")
+    ctx.add(
+        "info",
+        "device info plausible",
+        "pass" if plausible else "fail",
+        f"{info.width}x{info.height}, image buffer 0x{info.img_addr:08X}, FW '{info.fw}', LUT '{info.lut}'",
+    )
     if not plausible:
         print("    Garbage device info usually means SPI data is corrupted: try --speed 2000000,")
         print("    check that the HAT is set to SPI and that CS really is GPIO 8.")
         return False
     if info.lut != "M841" or (info.width, info.height) != (1200, 825):
-        ctx.add("info", "is the 9.7\" reference panel (M841, 1200x825)", "info", "different panel - results may differ")
-    ctx.add("info", "VCOM set", "pass" if after == vcom_mv else "fail",
-            f"before -{before / 1000:.2f} V, wanted -{vcom_mv / 1000:.2f} V, now -{after / 1000:.2f} V")
+        ctx.add(
+            "info",
+            'is the 9.7" reference panel (M841, 1200x825)',
+            "info",
+            "different panel - results may differ",
+        )
+    ctx.add(
+        "info",
+        "VCOM set",
+        "pass" if after == vcom_mv else "fail",
+        f"before -{before / 1000:.2f} V, wanted -{vcom_mv / 1000:.2f} V, now -{after / 1000:.2f} V",
+    )
     ctx.add("info", "init duration", "info", f"{ctx.timings['init_s']:.2f} s")
     return after == vcom_mv
 
@@ -708,8 +732,11 @@ def step_pattern(ctx: Ctx) -> None:
     show(ctx, detail_pattern(ctx.info.width, ctx.info.height), MODE_GC16, "pattern")
     ctx.ask("pattern", "1-px frame visible on all four edges")
     ctx.ask("pattern", "Diagonal lines are smooth and continuous (no zig-zag, gaps or shifted segments)")
-    ctx.ask("pattern", "Top right, 8 thin stripes: each fades from BLACK on its left edge to light gray on its "
-                       "right edge (use a magnifier or phone camera zoom)")
+    ctx.ask(
+        "pattern",
+        "Top right, 8 thin stripes: each fades from BLACK on its left edge to light gray on its "
+        "right edge (use a magnifier or phone camera zoom)",
+    )
 
 
 def step_partial(ctx: Ctx) -> None:
@@ -727,8 +754,11 @@ def step_partial(ctx: Ctx) -> None:
         durations.append(time.perf_counter() - t0)
     ctx.timings["partial_s"] = max(durations)
     ctx.add("partial", "partial update durations", "info", ", ".join(f"{d:.2f} s" for d in durations))
-    ctx.ask("partial", "Three areas changed one after another (black box top, gray strip middle, "
-                       "black box bottom right) and the REST of the screen did not flash")
+    ctx.ask(
+        "partial",
+        "Three areas changed one after another (black box top, gray strip middle, "
+        "black box bottom right) and the REST of the screen did not flash",
+    )
     # And back to white in one area: checks that partial GC16 cleans up.
     x, y, rw, rh = rects[0]
     show(ctx, base.crop(x, y, rw, rh), MODE_GC16, "partial-undo", x=x, y=y)
@@ -760,8 +790,10 @@ def step_rotate(ctx: Ctx) -> None:
     assert ctx.ctl and ctx.info
     print("\n== rotate: rotation by the controller (ADR 0008)")
     pw, ph = ctx.info.width, ctx.info.height
-    print("   Edges below refer to the panel held in its NORMAL LANDSCAPE position "
-          "(as in the 'gray' step, black bar on the left).")
+    print(
+        "   Edges below refer to the panel held in its NORMAL LANDSCAPE position "
+        "(as in the 'gray' step, black bar on the left)."
+    )
     for rot in ctx.args.rotations:
         lw, lh = logical_size(rot, pw, ph)
         print(f"\n -- rotation {rot} (logical image {lw}x{lh}, rotate code {controller_code(rot)})")
@@ -769,19 +801,29 @@ def step_rotate(ctx: Ctx) -> None:
         show(ctx, marker(lw, lh, rot), MODE_GC16, f"rot{rot}-full", rotate=rot)
         step = f"rotate {rot}"
         if lw % 4:
-            ctx.add(step, f"logical width {lw} is not a multiple of 4", "info",
-                    f"odd-width mode '{ctx.args.odd_width}'")
+            ctx.add(
+                step,
+                f"logical width {lw} is not a multiple of 4",
+                "info",
+                f"odd-width mode '{ctx.args.odd_width}'",
+            )
         ctx.ask(step, "Image is complete and undistorted (not sheared, no stripes)")
         ctx.ask(step, "Which physical edge has the thick black bar", ("top", "right", "bottom", "left"))
-        ctx.ask(step, f"Viewed with the bar on top: 'F' reads correctly (not mirrored) at the top-left, "
-                      f"with {rot // 90 + 1} square(s) to its right")
+        ctx.ask(
+            step,
+            f"Viewed with the bar on top: 'F' reads correctly (not mirrored) at the top-left, "
+            f"with {rot // 90 + 1} square(s) to its right",
+        )
         # Partial update in logical coordinates; DPY_AREA uses our clockwise mapping.
         bx, by, bw, bh = lw // 8 - (lw // 8) % 4, lh // 2, 160, 120
         box = Canvas(bw, bh, BLACK)
         box.rect(0, 0, 40, 40, WHITE)  # notch at the box's logical top-left
         show(ctx, box, MODE_GC16, f"rot{rot}-partial", rotate=rot, x=bx, y=by)
-        ans = ctx.ask(step, "Viewed upright: a black box appeared fully drawn, left of center, below the 'F', "
-                            "with a white notch in its top-left corner")
+        ans = ctx.ask(
+            step,
+            "Viewed upright: a black box appeared fully drawn, left of center, below the 'F', "
+            "with a white notch in its top-left corner",
+        )
         if ans == "n":
             print("    Refreshing the whole panel to see where the box was loaded ...")
             ctx.label(f"rot{rot}-reveal")
@@ -809,8 +851,12 @@ def step_timing(ctx: Ctx) -> None:
     t_disp = time.perf_counter() - t0
     mbit = len(payload) * 8 / t_up / 1e6 if t_up else 0
     ctx.add("timing", "pack full frame (pure Python, detail pattern)", "info", f"{t_pack:.2f} s")
-    ctx.add("timing", "upload full frame", "info",
-            f"{len(payload)} B in {t_up:.2f} s = {mbit:.1f} Mbit/s at --speed {ctx.args.speed}")
+    ctx.add(
+        "timing",
+        "upload full frame",
+        "info",
+        f"{len(payload)} B in {t_up:.2f} s = {mbit:.1f} Mbit/s at --speed {ctx.args.speed}",
+    )
     ctx.add("timing", "GC16 full waveform", "info", f"{t_disp:.2f} s")
 
 
@@ -857,8 +903,12 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     p.add_argument("--vcom", type=float, required=True, help="VCOM from the FPC cable, e.g. -1.50")
     p.add_argument("--steps", default=",".join(STEPS), help=f"comma-separated subset of: {','.join(STEPS)}")
     p.add_argument("--rotations", default="0,90,180,270", help="rotations for the 'rotate' step")
-    p.add_argument("--odd-width", choices=("pad", "trunc"), default="pad",
-                   help="rows whose width is not a multiple of 4: pad to whole words or truncate")
+    p.add_argument(
+        "--odd-width",
+        choices=("pad", "trunc"),
+        default="pad",
+        help="rows whose width is not a multiple of 4: pad to whole words or truncate",
+    )
     p.add_argument("--spi", default="/dev/spidev0.0")
     p.add_argument("--speed", type=int, default=12_000_000, help="SPI clock in Hz")
     p.add_argument("--gpiochip", default="/dev/gpiochip0")
@@ -886,6 +936,7 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     a = parse_args(argv)
     ctx = Ctx(a)
+
     def _on_sigterm(*_: object) -> None:
         raise KeyboardInterrupt
 
@@ -907,8 +958,10 @@ def main(argv: list[str] | None = None) -> int:
         except Exception as e:  # noqa: BLE001 - report any setup failure
             hint = ""
             if isinstance(e, OSError) and e.errno == 16:
-                hint = (f" - a GPIO line ({a.rst}/{a.hrdy}/{a.cs}) is in use; usually GPIO {a.cs} claimed as SPI CS0 "
-                        "because dtoverlay=spi0-0cs is missing (check: gpioinfo gpiochip0)")
+                hint = (
+                    f" - a GPIO line ({a.rst}/{a.hrdy}/{a.cs}) is in use; usually GPIO {a.cs} claimed as SPI CS0 "
+                    "because dtoverlay=spi0-0cs is missing (check: gpioinfo gpiochip0)"
+                )
             ctx.add("setup", "open SPI and GPIO", "fail", f"{type(e).__name__}: {e}{hint}")
             write_report(ctx, a.report)
             return 1

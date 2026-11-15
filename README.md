@@ -8,9 +8,10 @@ Waveshare IT8951 e-paper panel (reference: 9.7", 1200×825) connected to a Raspb
 - **Partial updates:** only changed rectangles are refreshed, with a full refresh every *N* updates against ghosting.
 - **Status page, health endpoint and current image**, configured via a YAML file and/or environment variables.
 
-> Status: requirements and design phase. See [docs/requirements.md](docs/requirements.md),
-> [docs/design.md](docs/design.md), [docs/configuration.md](docs/configuration.md) and the
-> [architecture decision records](docs/adr/README.md).
+> Status: v0.1.0 implemented and tested against a simulated panel. The hardware path was verified
+> with the [smoke test](docs/hardware-smoke-test.md); the container hasn't run on the Pi yet.
+> Docs: [requirements](docs/requirements.md), [design](docs/design.md),
+> [configuration](docs/configuration.md), [decisions (ADRs)](docs/adr/README.md).
 
 ```mermaid
 flowchart LR
@@ -73,29 +74,43 @@ Install Docker Engine with the compose plugin (for example `curl -fsSL https://g
 
 ## Quick start
 
-```yaml
-# compose.yaml
-services:
-  display:
-    image: ghcr.io/<owner>/ha-trmnl-ws-display:latest
-    restart: unless-stopped
-    stop_grace_period: 30s          # allow the clear-to-white on shutdown
-    ports: ["8080:8080"]
-    devices:
-      - /dev/spidev0.0
-      - /dev/gpiochip0
-    group_add: ["999", "997"]       # spi and gpio GIDs from step 2
-    volumes:
-      - ./config:/config:ro
-      - display-data:/data
-    environment:
-      EPD_PANEL__VCOM: "-1.50"
-volumes:
-  display-data:
-```
+On the Pi, in an empty directory:
 
-Then open `http://<pi>:8080/` for the status page. See [docs/configuration.md](docs/configuration.md) for all settings.
+1. Copy [`compose.example.yaml`](compose.example.yaml) to `compose.yaml`. Set the image owner, the `group_add` GIDs from step 2 and your VCOM.
+2. Optionally copy [`config.example.yaml`](config.example.yaml) to `config/config.yaml` for further settings. All settings are listed in [docs/configuration.md](docs/configuration.md).
+3. `docker compose up -d`, then open `http://<pi>:8080/` for the status page.
+
+## HTTP API
+
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /api/image` | Push an image: the raw PNG/JPEG as the body, as the add-on's *Raw Image* webhook sends it. `?refresh=full` forces a full refresh. Answers `202`. |
+| `POST /api/refresh` | Full refresh of the current image |
+| `POST /api/clear` | Clear the panel to white |
+| `GET /health` | `200` when service and panel are OK, `503` while starting or on panel errors (not affected by the add-on being down) |
+| `GET /api/status` | Status as JSON: panel, current image, last update, counters, pull state, effective config (secrets masked) |
+| `GET /api/image/current.png` | The image currently on the panel |
+| `GET /` | Status page with the current image and buttons for refresh/clear |
+| `GET /docs` | Interactive OpenAPI documentation |
+
+If `push.token` is set, all `POST` endpoints need `Authorization: Bearer <token>`.
 
 ## Development
 
-The commands to lint, test and build locally will be documented here once the implementation exists (planned: `uv`, `ruff`, `mypy`, `pytest`).
+Requires [uv](https://docs.astral.sh/uv/). It installs Python 3.12 and all tools into `.venv`. The Pi-only packages (`spidev`, `gpiod`) are in the optional `hw` extra and aren't needed for development.
+
+```sh
+uv sync                                   # create .venv with dev tools
+uv run pytest --cov                       # tests (no hardware needed)
+uv run ruff check . && uv run ruff format --check . && uv run mypy
+```
+
+Run the service locally against the simulated panel:
+
+```sh
+EPD_PANEL__VCOM=-1.5 EPD_PANEL__DRIVER=fake EPD_STORAGE__DATA_DIR=.data \
+  uv run ha-trmnl-ws-display
+curl -X POST --data-binary @dashboard.png http://localhost:8080/api/image
+```
+
+The image is built in GitHub Actions for `linux/arm64` and published to `ghcr.io/<owner>/<repo>` ([workflow](.github/workflows/ci.yml)). To build it locally, use `docker buildx build --platform linux/arm64 .` (needs QEMU/binfmt on non-ARM hosts).

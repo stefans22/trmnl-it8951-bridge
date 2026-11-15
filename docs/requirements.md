@@ -1,6 +1,6 @@
 # Requirements
 
-Status: **draft** — to be agreed before implementation starts.
+Status: **agreed**; implemented in v0.1.0.
 Companion documents: [design.md](design.md), [../README.md](../README.md) (host setup).
 
 ## 1. Purpose

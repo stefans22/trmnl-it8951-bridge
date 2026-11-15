@@ -1,6 +1,6 @@
 # Configuration
 
-Status: **draft**. Must be kept in sync with `src/ha_trmnl_ws_display/config.py` (a test will check that every model field is documented here).
+Must be kept in sync with `src/ha_trmnl_ws_display/config.py` (a test will check that every model field is documented here).
 
 ## Sources and precedence
 
@@ -39,10 +39,10 @@ pull:
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| `driver` | `it8951` \| `fake` | `it8951` | `fake` simulates the panel in memory (development, no hardware). |
 | `vcom` | float (V, < 0) | **required** | VCOM from the FPC cable, e.g. `-1.50`. |
 | `spi_device` | path | `/dev/spidev0.0` | SPI device node. |
 | `spi_speed_hz` | int | `12000000` | SPI clock. The Pi 3 handles up to ~15.6 MHz. |
-| `spi_chunk_bytes` | int | `4096` | Maximum bytes per spidev transfer (≤ kernel `spidev.bufsiz`). |
 | `gpio_chip` | path | `/dev/gpiochip0` | GPIO chip that carries the header pins. |
 | `pin_rst` | int (BCM) | `17` | Reset line. |
 | `pin_hrdy` | int (BCM) | `24` | Host-ready/busy line. |

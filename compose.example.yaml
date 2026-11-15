@@ -1,0 +1,23 @@
+# Example for the Raspberry Pi. Host prerequisites: see README.md ("Host requirements").
+services:
+  display:
+    image: ghcr.io/OWNER/ha-trmnl-ws-display:latest   # replace OWNER with the GitHub owner
+    restart: unless-stopped
+    stop_grace_period: 30s          # time for the clear-to-white on shutdown
+    ports:
+      - "8080:8080"
+    devices:
+      - /dev/spidev0.0
+      - /dev/gpiochip0
+    group_add:                      # GIDs of the host's spi and gpio groups: `getent group spi gpio`
+      - "999"
+      - "997"
+    volumes:
+      - ./config:/config:ro         # config.yaml (optional if everything is set via environment)
+      - display-data:/data          # last image + refresh counters
+    environment:
+      EPD_PANEL__VCOM: "-1.87"
+      # EPD_PUSH__TOKEN: change-me
+
+volumes:
+  display-data:

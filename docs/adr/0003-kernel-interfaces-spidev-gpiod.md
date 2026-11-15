@@ -21,4 +21,4 @@ Option 3. Only `/dev/spidev0.0` and `/dev/gpiochip0` are mapped into the contain
 
 - No `--privileged` and no root inside the container.
 - spidev limits a single transfer to `bufsiz` (4096 B by default), so bulk writes are chunked. See [0004](0004-manual-chip-select.md) for why that's safe.
-- The python `gpiod` bindings must match libgpiod v2. This needs checking in the base image.
+- The python `gpiod` bindings must match libgpiod v2. Resolved: `gpiod` ≥ 2.2 from PyPI bundles the libgpiod C sources and is compiled in the image's build stage. The service also supports the v1 bindings (Debian's `python3-libgpiod` 1.6), which the smoke test used on the host.
