@@ -37,7 +37,8 @@ class Runtime:
         self.settings = settings
         self.status = Status()
         self.mailbox = Mailbox()
-        self.store = StateStore(settings.storage.data_dir, settings.storage.persist)
+        storage = settings.storage
+        self.store = StateStore(storage.data_dir, storage.persist, storage.keep_images)
         self.worker = DisplayWorker(settings, panel, self.mailbox, self.store, self.status)
         self.puller = Puller(settings.pull, self.submit) if settings.pull.enabled else None
         self._pull_task: asyncio.Task[None] | None = None
@@ -62,6 +63,7 @@ class Runtime:
 
     async def submit(self, data: bytes, source: str, force_full: bool = False) -> Accepted:
         """Decode and queue an image. Raises ImageRejectedError or NotReadyError."""
+        await anyio.to_thread.run_sync(self.store.archive, data, source)
         pipeline = self.worker.pipeline
         if pipeline is None:
             raise NotReadyError("panel not initialised yet")

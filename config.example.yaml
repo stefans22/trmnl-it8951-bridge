@@ -20,5 +20,8 @@ pull:
   # url: http://homeassistant.local:10000/lovelace/0?viewport=1200x825&dithering&palette=gray-16
   # interval_s: 600
 
+# storage:
+#   keep_images: 20      # debugging: keep the last 20 received images in /data/images
+
 log:
   level: INFO

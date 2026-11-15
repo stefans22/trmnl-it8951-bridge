@@ -108,9 +108,28 @@ class StateStore:
     STATE = "state.json"
     IMAGE = "current.png"
 
-    def __init__(self, data_dir: Path, persist: bool) -> None:
+    IMAGES = "images"
+
+    def __init__(self, data_dir: Path, persist: bool, keep_images: int = 0) -> None:
         self.dir = data_dir
         self.persist = persist
+        self.keep_images = keep_images
+
+    def archive(self, data: bytes, source: str) -> None:
+        """Keep a received image as-is in ``images/`` (debugging aid), pruned to the newest N."""
+        if not self.keep_images:
+            return
+        ext = ".png" if data.startswith(b"\x89PNG") else ".jpg" if data.startswith(b"\xff\xd8") else ".bin"
+        folder = self.dir / self.IMAGES
+        try:
+            folder.mkdir(parents=True, exist_ok=True)
+            # The timestamp prefix makes name order = age order.
+            name = f"{datetime.now(UTC):%Y%m%dT%H%M%S%fZ}-{source}{ext}"
+            self._atomic_write(f"{self.IMAGES}/{name}", data)
+            for old in sorted(p for p in folder.iterdir() if not p.name.startswith("."))[: -self.keep_images]:
+                old.unlink()
+        except OSError as e:
+            log.warning("cannot keep received image in %s: %s", folder, e)
 
     def load(self) -> tuple[Persisted, bytes | None]:
         if not self.persist:
@@ -144,11 +163,12 @@ class StateStore:
             log.error("cannot persist state to %s: %s", self.dir, e)
 
     def _atomic_write(self, name: str, data: bytes) -> None:
-        fd, tmp = tempfile.mkstemp(dir=self.dir, prefix=f".{name}.")
+        target = self.dir / name
+        fd, tmp = tempfile.mkstemp(dir=target.parent, prefix=f".{target.name}.")
         try:
             with os.fdopen(fd, "wb") as f:
                 f.write(data)
-            os.replace(tmp, self.dir / name)
+            os.replace(tmp, target)
         except BaseException:
             with contextlib.suppress(FileNotFoundError):
                 os.unlink(tmp)

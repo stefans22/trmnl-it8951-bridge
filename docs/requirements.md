@@ -85,6 +85,7 @@ flowchart LR
 | FR-22 | `GET /api/image/current.png` returns the frame as it is currently shown on the panel, in logical orientation. |
 | FR-23 | `GET /` serves a small, dependency-free HTML status page that shows the current image and the status data, plus buttons for the manual actions (FR-19). |
 | FR-24 | Logs are written to stdout in a structured, line-oriented format with a configurable level. |
+| FR-25 | For debugging, the last *N* received images can optionally be kept unchanged in the data directory (configurable, default off). |
 
 ### 4.4 Configuration
 

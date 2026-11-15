@@ -103,6 +103,7 @@ pull:
 |-----|------|---------|-------------|
 | `data_dir` | path | `/data` | Where `state.json` and `current.png` live. |
 | `persist` | bool | `true` | Persist state across restarts. |
+| `keep_images` | int ≥ 0 | `0` | Debugging: keep the last N received images (push and pull, as received, including rejected ones) in `<data_dir>/images/`. `0` = off. |
 
 ### `log`
 

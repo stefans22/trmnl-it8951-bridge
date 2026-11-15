@@ -216,6 +216,7 @@ classDiagram
 - `/data/current.png`: the frame's preview, i.e. the image in logical orientation as it is shown on the panel. It is deleted when the panel is cleared via the API, and kept on shutdown so it can be restored on the next start.
 - Writes are atomic (temp file + `os.replace`). There is one write per panel update, so SD card wear is negligible.
 - `storage.persist: false` keeps everything in memory only.
+- `storage.keep_images: N` (debugging, default `0` = off) saves every received image unchanged, including rejected ones, as `/data/images/<UTC timestamp>-<source>.<png|jpg|bin>` and deletes all but the newest N. This happens before decoding and is independent of `persist`.
 
 ### 3.9 HTTP API
 

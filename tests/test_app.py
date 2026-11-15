@@ -138,6 +138,15 @@ async def test_push_rejections(secured: Settings) -> None:
         assert runtime.status.persisted.counters.rejected == 2
 
 
+async def test_keep_images_includes_rejected(make_settings: SettingsFactory) -> None:
+    settings = make_settings(storage={"keep_images": 5})
+    async with ready(settings) as (client, _):
+        await client.post("/api/image", content=image(0))
+        await client.post("/api/image", content=b"garbage")
+    names = sorted(p.name for p in (settings.storage.data_dir / "images").iterdir())
+    assert [n.rsplit("-", 1)[1] for n in names] == ["push.png", "push.bin"]
+
+
 async def test_body_limit(make_settings: SettingsFactory) -> None:
     async with ready(make_settings(push={"max_body_bytes": 100})) as (client, _):
         assert (await client.post("/api/image", content=b"x" * 101)).status_code == 413

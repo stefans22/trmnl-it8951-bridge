@@ -89,6 +89,7 @@ class ServerConfig(_Section):
 class StorageConfig(_Section):
     data_dir: Path = Path("/data")
     persist: bool = True
+    keep_images: int = Field(default=0, ge=0, description="keep the last N received images (0 = off)")
 
 
 class LogConfig(_Section):

@@ -47,6 +47,27 @@ def test_store_write_error_is_logged(tmp_path: Path, caplog: pytest.LogCaptureFi
     assert "cannot persist" in caplog.text
 
 
+def test_archive_keeps_newest_n(tmp_path: Path) -> None:
+    store = StateStore(tmp_path, False, keep_images=2)  # independent of persist
+    for data in (b"\x89PNG first", b"\xff\xd8 second", b"third"):
+        store.archive(data, "push")
+    files = sorted((tmp_path / "images").iterdir())
+    assert [f.suffix for f in files] == [".jpg", ".bin"]
+    assert files[-1].read_bytes() == b"third"
+    assert files[-1].name.endswith("-push.bin")
+
+
+def test_archive_off_by_default(tmp_path: Path) -> None:
+    StateStore(tmp_path, True).archive(b"\x89PNG", "pull")
+    assert not (tmp_path / "images").exists()
+
+
+def test_archive_write_error_is_logged(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
+    (tmp_path / "images").write_text("not a directory")
+    StateStore(tmp_path, True, keep_images=1).archive(b"x", "push")
+    assert "cannot keep received image" in caplog.text
+
+
 def test_status_snapshot() -> None:
     s = Status()
     s.error("boom")
