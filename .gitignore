@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Local runtime data / config
+/data/
+/config/config.yaml
+.env
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Waveshare vendor bundle: keep only what is useful as reference
+# (the Raspberry Pi C driver, readmes and the wiki PDF).
+docs/waveshare/IT8951-ePaper/STM32/
+docs/waveshare/IT8951-ePaper/Raspberry/pic/
+docs/waveshare/*.webarchive
