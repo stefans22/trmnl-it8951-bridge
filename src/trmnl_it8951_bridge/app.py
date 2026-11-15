@@ -27,7 +27,7 @@ def create_app(runtime: Runtime) -> FastAPI:
             await runtime.stop()
 
     app = FastAPI(
-        title="ha-trmnl-ws-display",
+        title="trmnl-it8951-bridge",
         version=__version__,
         lifespan=lifespan,
         description="Shows TRMNL HA add-on images on an IT8951 e-paper panel.",

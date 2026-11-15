@@ -5,10 +5,10 @@ import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 
-from ha_trmnl_ws_display.driver.base import Waveform
-from ha_trmnl_ws_display.driver.fake import FakePanel
-from ha_trmnl_ws_display.driver.packing import pack_4bpp, unpack_4bpp
-from ha_trmnl_ws_display.geometry import Rect, controller_code, logical_size, to_physical
+from trmnl_it8951_bridge.driver.base import Waveform
+from trmnl_it8951_bridge.driver.fake import FakePanel
+from trmnl_it8951_bridge.driver.packing import pack_4bpp, unpack_4bpp
+from trmnl_it8951_bridge.geometry import Rect, controller_code, logical_size, to_physical
 
 PW, PH = 48, 32  # small panel for exhaustive geometry checks
 

@@ -1,7 +1,7 @@
 # Example for the Raspberry Pi. Host prerequisites: see README.md ("Host requirements").
 services:
   display:
-    image: ghcr.io/OWNER/ha-trmnl-ws-display:latest   # replace OWNER with the GitHub owner
+    image: ghcr.io/OWNER/trmnl-it8951-bridge:latest   # replace OWNER with the GitHub owner
     restart: unless-stopped
     stop_grace_period: 30s          # time for the clear-to-white on shutdown
     ports:

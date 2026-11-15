@@ -39,7 +39,7 @@ class Puller:
         submit: Submit,
         *,
         transport: httpx.AsyncBaseTransport | None = None,
-        user_agent: str = "ha-trmnl-ws-display",
+        user_agent: str = "trmnl-it8951-bridge",
     ) -> None:
         if cfg.url is None:
             raise ValueError("pull.url is not set")

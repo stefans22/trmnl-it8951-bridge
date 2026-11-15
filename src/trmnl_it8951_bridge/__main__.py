@@ -17,7 +17,7 @@ from .driver.fake import FakePanel
 from .driver.it8951 import IT8951Panel
 from .runtime import Runtime
 
-log = logging.getLogger("ha_trmnl_ws_display")
+log = logging.getLogger("trmnl_it8951_bridge")
 
 
 class JsonFormatter(logging.Formatter):
@@ -72,7 +72,7 @@ def main() -> int:
         print(f"invalid configuration:\n{e}", file=sys.stderr)
         return 2
     setup_logging(settings.log)
-    log.info("ha-trmnl-ws-display %s starting", __version__)
+    log.info("trmnl-it8951-bridge %s starting", __version__)
     log.info("configuration: %s", json.dumps(settings.redacted()))
     try:
         panel = build_panel(settings.panel)

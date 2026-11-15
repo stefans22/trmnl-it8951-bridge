@@ -8,8 +8,8 @@ from collections import deque
 import numpy as np
 import pytest
 
-from ha_trmnl_ws_display.driver.base import PanelError, Waveform
-from ha_trmnl_ws_display.driver.it8951 import (
+from trmnl_it8951_bridge.driver.base import PanelError, Waveform
+from trmnl_it8951_bridge.driver.it8951 import (
     CMD_DPY_AREA,
     CMD_GET_DEV_INFO,
     CMD_LD_IMG_AREA,
@@ -24,7 +24,7 @@ from ha_trmnl_ws_display.driver.it8951 import (
     REG_LUTAFSR,
     IT8951Panel,
 )
-from ha_trmnl_ws_display.driver.packing import pack_4bpp
+from trmnl_it8951_bridge.driver.packing import pack_4bpp
 
 
 def dev_info_words(w: int = 1200, h: int = 825, addr: int = 0x0011A1E0) -> list[int]:

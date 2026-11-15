@@ -7,9 +7,9 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from ha_trmnl_ws_display.mailbox import Command, Mailbox
-from ha_trmnl_ws_display.pipeline import Frame
-from ha_trmnl_ws_display.state import Counters, CurrentFrame, Persisted, StateStore, Status
+from trmnl_it8951_bridge.mailbox import Command, Mailbox
+from trmnl_it8951_bridge.pipeline import Frame
+from trmnl_it8951_bridge.state import Counters, CurrentFrame, Persisted, StateStore, Status
 
 
 def test_store_roundtrip(tmp_path: Path) -> None:

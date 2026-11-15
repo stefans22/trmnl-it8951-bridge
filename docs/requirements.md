@@ -16,7 +16,7 @@ flowchart LR
     ADDON -->|"push: POST image/png"| SVC
     SVC -->|"pull: GET image"| ADDON
     subgraph PI[Raspberry Pi 3, 64-bit OS]
-        SVC[ha-trmnl-ws-display container]
+        SVC[trmnl-it8951-bridge container]
         SVC -->|"SPI + GPIO"| HAT[Waveshare IT8951 HAT]
     end
     HAT --> PANEL[9.7&quot; e-paper 1200x825]

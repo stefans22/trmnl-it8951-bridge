@@ -305,7 +305,7 @@ sequenceDiagram
 ├── compose.example.yaml
 ├── config.example.yaml
 ├── .github/workflows/ci.yml
-├── src/ha_trmnl_ws_display/
+├── src/trmnl_it8951_bridge/
 │   ├── __main__.py              # entrypoint, logging, panel construction, uvicorn
 │   ├── config.py                # settings model (file + env)
 │   ├── runtime.py               # wires worker, mailbox, pull, status; submit()

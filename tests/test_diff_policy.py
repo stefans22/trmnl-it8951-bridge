@@ -7,11 +7,11 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from ha_trmnl_ws_display.config import DisplayConfig
-from ha_trmnl_ws_display.diff import dirty_rects
-from ha_trmnl_ws_display.geometry import Rect
-from ha_trmnl_ws_display.pipeline import Frame
-from ha_trmnl_ws_display.policy import plan_update
+from trmnl_it8951_bridge.config import DisplayConfig
+from trmnl_it8951_bridge.diff import dirty_rects
+from trmnl_it8951_bridge.geometry import Rect
+from trmnl_it8951_bridge.pipeline import Frame
+from trmnl_it8951_bridge.policy import plan_update
 
 W, H = 1200, 825
 

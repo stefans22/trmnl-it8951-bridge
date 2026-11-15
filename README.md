@@ -1,4 +1,4 @@
-# ha-trmnl-ws-display
+# trmnl-it8951-bridge
 
 Show Home Assistant dashboards rendered by the
 [TRMNL HA add-on](https://github.com/usetrmnl/trmnl-home-assistant) on a
@@ -8,6 +8,8 @@ Waveshare IT8951 e-paper panel (reference: 9.7", 1200×825) connected to a Raspb
 - **Partial updates:** only changed rectangles are refreshed, with a full refresh every *N* updates against ghosting.
 - **Status page, health endpoint and current image**, configured via a YAML file and/or environment variables.
 
+This is an unofficial community project, not affiliated with TRMNL or Waveshare.
+
 > Status: v0.1.0 implemented and tested against a simulated panel. The hardware path was verified
 > with the [smoke test](docs/hardware-smoke-test.md); the container hasn't run on the Pi yet.
 > Docs: [requirements](docs/requirements.md), [design](docs/design.md),
@@ -15,7 +17,7 @@ Waveshare IT8951 e-paper panel (reference: 9.7", 1200×825) connected to a Raspb
 
 ```mermaid
 flowchart LR
-    ADDON["TRMNL HA add-on"] -- "push: POST /api/image" --> SVC["ha-trmnl-ws-display<br/>(container on Pi 3)"]
+    ADDON["TRMNL HA add-on"] -- "push: POST /api/image" --> SVC["trmnl-it8951-bridge<br/>(container on Pi 3)"]
     SVC -- "pull: GET fetch URL" --> ADDON
     SVC -- "SPI + GPIO" --> PANEL["IT8951 HAT + e-paper"]
 ```
@@ -109,7 +111,7 @@ Run the service locally against the simulated panel:
 
 ```sh
 EPD_PANEL__VCOM=-1.5 EPD_PANEL__DRIVER=fake EPD_STORAGE__DATA_DIR=.data \
-  uv run ha-trmnl-ws-display
+  uv run trmnl-it8951-bridge
 curl -X POST --data-binary @dashboard.png http://localhost:8080/api/image
 ```
 

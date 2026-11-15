@@ -11,10 +11,10 @@ import httpx
 import numpy as np
 import pytest
 
-from ha_trmnl_ws_display.app import create_app
-from ha_trmnl_ws_display.config import Settings
-from ha_trmnl_ws_display.driver.fake import FakePanel
-from ha_trmnl_ws_display.runtime import Runtime
+from trmnl_it8951_bridge.app import create_app
+from trmnl_it8951_bridge.config import Settings
+from trmnl_it8951_bridge.driver.fake import FakePanel
+from trmnl_it8951_bridge.runtime import Runtime
 
 from .conftest import SettingsFactory, png
 

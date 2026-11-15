@@ -6,13 +6,13 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from ha_trmnl_ws_display.config import Settings
-from ha_trmnl_ws_display.driver.base import Waveform
-from ha_trmnl_ws_display.driver.fake import FakePanel
-from ha_trmnl_ws_display.mailbox import Command, Mailbox
-from ha_trmnl_ws_display.pipeline import to_png
-from ha_trmnl_ws_display.state import Persisted, StateStore, Status
-from ha_trmnl_ws_display.worker import DisplayWorker
+from trmnl_it8951_bridge.config import Settings
+from trmnl_it8951_bridge.driver.base import Waveform
+from trmnl_it8951_bridge.driver.fake import FakePanel
+from trmnl_it8951_bridge.mailbox import Command, Mailbox
+from trmnl_it8951_bridge.pipeline import to_png
+from trmnl_it8951_bridge.state import Persisted, StateStore, Status
+from trmnl_it8951_bridge.worker import DisplayWorker
 
 from .conftest import SettingsFactory, png, wait_for
 
@@ -150,7 +150,7 @@ def test_error_state_then_recovery_on_next_frame(harness: Harness) -> None:
 
 
 def test_startup_failure_then_retry(make_settings: SettingsFactory, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr("ha_trmnl_ws_display.worker.RETRY_INTERVAL_S", 0.01)
+    monkeypatch.setattr("trmnl_it8951_bridge.worker.RETRY_INTERVAL_S", 0.01)
     panel = FakePanel(W, H)
     panel.fail_next = 2
     h = Harness(make_settings(), panel)

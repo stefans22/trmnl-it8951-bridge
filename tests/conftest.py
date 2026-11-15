@@ -11,8 +11,8 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from ha_trmnl_ws_display.config import Settings, load_settings
-from ha_trmnl_ws_display.driver.base import Pixels
+from trmnl_it8951_bridge.config import Settings, load_settings
+from trmnl_it8951_bridge.driver.base import Pixels
 
 
 @pytest.fixture(autouse=True)

@@ -24,7 +24,7 @@ class _Gpio:
     def __init__(self, chip: Path, outputs: list[int], inputs: list[int]) -> None:
         import gpiod
 
-        consumer = "ha-trmnl-ws-display"
+        consumer = "trmnl-it8951-bridge"
         self._v2 = hasattr(gpiod, "request_lines")
         if self._v2:
             from gpiod.line import Direction, Value

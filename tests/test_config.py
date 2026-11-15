@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from ha_trmnl_ws_display.config import Settings, load_settings
+from trmnl_it8951_bridge.config import Settings, load_settings
 
 
 def test_vcom_is_required() -> None:

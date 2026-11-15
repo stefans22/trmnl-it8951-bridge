@@ -1,6 +1,6 @@
 # Configuration
 
-Must be kept in sync with `src/ha_trmnl_ws_display/config.py` (a test will check that every model field is documented here).
+Must be kept in sync with `src/trmnl_it8951_bridge/config.py` (a test will check that every model field is documented here).
 
 ## Sources and precedence
 

@@ -5,9 +5,9 @@ import asyncio
 import httpx
 import pytest
 
-from ha_trmnl_ws_display.config import PullConfig
-from ha_trmnl_ws_display.pipeline import ImageRejectedError
-from ha_trmnl_ws_display.pull import FIRST_BACKOFF_S, Puller
+from trmnl_it8951_bridge.config import PullConfig
+from trmnl_it8951_bridge.pipeline import ImageRejectedError
+from trmnl_it8951_bridge.pull import FIRST_BACKOFF_S, Puller
 
 URL = "http://addon.local:10000/lovelace/0?viewport=1200x825"
 

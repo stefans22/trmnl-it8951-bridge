@@ -6,8 +6,8 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from ha_trmnl_ws_display.config import DisplayConfig
-from ha_trmnl_ws_display.pipeline import (
+from trmnl_it8951_bridge.config import DisplayConfig
+from trmnl_it8951_bridge.pipeline import (
     ImageRejectedError,
     Pipeline,
     SizeMismatchError,
@@ -119,8 +119,8 @@ def test_software_rotation_produces_physical_frame() -> None:
 @pytest.mark.parametrize("via_controller", [True, False])
 def test_mirror_is_physical_in_both_modes(via_controller: bool) -> None:
     """mirror_x flips the physical x axis, whoever does the rotation."""
-    from ha_trmnl_ws_display.driver.base import Waveform
-    from ha_trmnl_ws_display.driver.fake import FakePanel
+    from trmnl_it8951_bridge.driver.base import Waveform
+    from trmnl_it8951_bridge.driver.fake import FakePanel
 
     p = pipe(rotation=90, rotation_via_controller=via_controller, mirror_x=True)
     frame = p.process(png(marked_image()), "push")

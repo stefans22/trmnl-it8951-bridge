@@ -25,7 +25,7 @@ RUN uv sync --frozen --no-dev --extra hw --no-editable
 # --------------------------------------------------------------------------- #
 FROM python:3.12-slim-bookworm
 
-LABEL org.opencontainers.image.title="ha-trmnl-ws-display" \
+LABEL org.opencontainers.image.title="trmnl-it8951-bridge" \
       org.opencontainers.image.description="TRMNL HA add-on images on a Waveshare IT8951 e-paper panel" \
       org.opencontainers.image.licenses="MIT"
 
@@ -49,4 +49,4 @@ STOPSIGNAL SIGTERM
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
     CMD ["python", "-c", "import os, sys, urllib.request; port = os.environ.get('EPD_SERVER__PORT', '8080'); sys.exit(0 if urllib.request.urlopen(f'http://127.0.0.1:{port}/health', timeout=4).status == 200 else 1)"]
 
-CMD ["ha-trmnl-ws-display"]
+CMD ["trmnl-it8951-bridge"]
